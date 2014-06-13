@@ -2,7 +2,7 @@ var RW = {'version':'1.0.0'};
 
 /*	Class RW.Object		*/
 RW.Object = function(props) {
-	if(props) {
+	if(this != undefined && props) {
 		console.log("Creating new RW.Object");
 		// initialize;
 		return this;
