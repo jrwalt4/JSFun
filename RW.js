@@ -112,29 +112,37 @@ RW.confirm = function (vOptions, fYesCallback, fNoCallback) {
 /*------------		Classes			------------------------*/
 /*------------	RW.Object			------------------------*/
 RW.Object = function () {
-	this._id = this.getId();
-	this.bound = {};
-	this.bind();
+	this._id;
+	this.bound = {}; //functions that will be bound to the object
 	return this;
 };
 
-RW.Object.prototype.version = '1.0.0';
-
-RW.Object.prototype.getId = function() {
-	return (new Date()).getTime();
-};
-
-RW.Object.prototype.toString = function() {
-	return "["+this._id+" RW.Object]";
-};
-
-RW.Object.prototype.bind = function() {
-	//console.trace();
-	//console.log(this);
-	for (prop in this) {
-		if (typeof this[prop] == 'function' && !Object.prototype.hasOwnProperty(prop)) {
-			this.bound[prop] = this[prop].bind(this);
+RW.Object.prototype = {
+	version: '1.0.0',
+	init: function() {
+		this._id = this.getId();
+		this.bind();
+		return this;
+	},
+	getId: function() {
+		if (this._id) return this._id;
+		else {
+			this._id = (new Date()).getTime()+'';
+			return this._id;
 		}
+	},
+	bind: function bind () {
+		for (prop in this) {
+			if (typeof this[prop] == 'function' 
+				&& !Object.prototype.hasOwnProperty(prop)
+				&& prop != 'bind'
+				&& prop != 'init') {
+				this.bound[prop] = this[prop].bind(this);
+			}
+		}
+	},
+	toString: function() {
+		return "["+this._id+" RW.Object]";
 	}
 };
 
@@ -142,14 +150,17 @@ RW.Object.prototype.bind = function() {
 /* Example subclass to RW.Object	
  */
 RW.Sub = function (oProps) {
-	if(RW.Object.call(this,oProps)) {
-		// further instantiation
-		jQuery.extend(this,oProps);
-		return this;
-	}
+	RW.Object.call(this);
+	// further instantiation goes in ...prototype.init()
 };
 
 RW.Sub.prototype = new RW.Object;
+
+RW.Sub.prototype.init = function(oProps) {
+	RW.Object.prototype.init.call(this);
+	jQuery.extend(this,oProps);
+	return this;
+};
 
 /*------------	RW.DoodlePad			------------------------*/
 /* RW.DoodlePad - an HTML <canvas> element that let's you draw with the mouse
@@ -163,6 +174,11 @@ RW.DoodlePad = function DoodlePad(cvs) {
 
 RW.DoodlePad.prototype = new RW.Object;
 
+RW.DoodlePad.prototype.init = function(oOptions) {
+	RW.Object.prototype.init.call(this);
+	//
+};
+
 /*------------	RW.ActionBox			------------------------*/
 /* A box that appears in the center of the screen that asks the user to provide 
  * information or select an options before continuing
@@ -174,6 +190,7 @@ RW.ActionBox = function (oOptions) {
 	 *	- inputs: ["name",...]
 	 */
 	RW.Object.call(this);
+	RW.Object.prototype.init.call(this);
 	var options = {};
 	if (oOptions) {
 		switch(typeof oOptions) {
