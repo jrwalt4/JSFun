@@ -118,15 +118,15 @@ RW.confirm = function (vOptions, fYesCallback, fNoCallback) {
 /*------------		Classes			------------------------*/
 /*------------	RW.Object			------------------------*/
 RW.Object = function () {
-	this._id;
-	this.bound = {}; // a holder for the functions that will be bound to the object
+	this._id = null;
+	this.bound = {}; // a holder for the methods that will be bound to the object
 	return this;
 };
 
 RW.Object.prototype = {
 	version: '1.0.0',
 	init: function() {
-		this._id = this.getId();
+		this.getId();
 		this.bind();
 		return this;
 	},
