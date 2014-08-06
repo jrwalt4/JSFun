@@ -17,35 +17,36 @@
  */
 
 /*------------		Compatibility		------------------------*/
-/* Workaround for older browsers that do not support Function.bind
+
+/*------------		Function.bind		------------------------
  * Taken from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind 
  */
 if (!Function.prototype.bind) {
-  Function.prototype.bind = function (oThis) {
-    if (typeof this !== "function") {
-      // closest thing possible to the ECMAScript 5
-      // internal IsCallable function
-      throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
-    }
+	Function.prototype.bind = function (oThis) {
+		if (typeof this !== "function") {
+			// closest thing possible to the ECMAScript 5
+			// internal IsCallable function
+			throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+		}
 
-    var aArgs = Array.prototype.slice.call(arguments, 1), 
-        fToBind = this, 
-        fNOP = function () {},
-        fBound = function () {
-          return fToBind.apply(this instanceof fNOP && oThis
-                 ? this
-                 : oThis,
-                 aArgs.concat(Array.prototype.slice.call(arguments)));
-        };
+		var aArgs = Array.prototype.slice.call(arguments, 1), 
+			fToBind = this, 
+			fNOP = function () {},
+			fBound = function () {
+				return fToBind.apply(this instanceof fNOP && oThis
+					? this
+					: oThis,
+					aArgs.concat(Array.prototype.slice.call(arguments)));
+			};
 
-    fNOP.prototype = this.prototype;
-    fBound.prototype = new fNOP();
+		fNOP.prototype = this.prototype;
+		fBound.prototype = new fNOP();
 
-    return fBound;
-  };
+		return fBound;
+	};
 }
 
-/*	Simple application of Arr.forEach for IE <8 compatibility	*/
+/*------------		Array.forEach		------------------------*/
 if (!Array.prototype.forEach) {
 	Array.prototype.forEach = function(fCallback) {
 		if (typeof fCallback != 'function') throw new TypeError('Function is not callable');
@@ -55,6 +56,7 @@ if (!Array.prototype.forEach) {
 	}
 }
 
+/*------------		RW declaration		------------------------*/
 var RW = {
 	version:'1.0.0'
 };
@@ -100,12 +102,16 @@ RW.objectify = function(jForm) {
 };
 
 RW.confirm = function (vOptions, fYesCallback, fNoCallback) {
+	// allow RW.confirm to be called from an event with data attached
 	if(jQuery.Event.prototype.isPrototypeOf(vOptions)) vOptions = vOptions.data;
-	//console.info(vOptions);
+
+	// keep button from being clicked again
 	if (window.event) {
 		$(window.event.target).blur();
 	}
 	var confBox = new RW.ConfirmationBox(vOptions);
+
+	// return the jQuery object that comes from RW.ActionBox.show() so event handlers can be attached
 	return confBox.show();
 };
 
@@ -113,7 +119,7 @@ RW.confirm = function (vOptions, fYesCallback, fNoCallback) {
 /*------------	RW.Object			------------------------*/
 RW.Object = function () {
 	this._id;
-	this.bound = {}; //functions that will be bound to the object
+	this.bound = {}; // a holder for the functions that will be bound to the object
 	return this;
 };
 
@@ -146,11 +152,15 @@ RW.Object.prototype = {
 	}
 };
 
-/*------------	RW.Sub				------------------------*/
-/* Example subclass to RW.Object	
+/*------------	RW.Sub				------------------------
+ * Example subclass to RW.Object
+ * Call the parent constructor function using "RW.Object.call(this)" 
+ * Override the "init()" method but call the parent method from within 
+ * "RW.Object.prototype.init.call(this)"
  */
 RW.Sub = function (oProps) {
-	RW.Object.call(this);
+	RW.Object.call(this); // instantiate instance variables
+	return this;
 	// further instantiation goes in ...prototype.init()
 };
 
@@ -162,8 +172,8 @@ RW.Sub.prototype.init = function(oProps) {
 	return this;
 };
 
-/*------------	RW.DoodlePad			------------------------*/
-/* RW.DoodlePad - an HTML <canvas> element that let's you draw with the mouse
+/*------------	RW.DoodlePad			------------------------*
+ * An HTML <canvas> element that let's you draw with the mouse
  * and use the image.	
  */
 
@@ -300,20 +310,25 @@ jQuery.extend(RW.ConfirmationBox.prototype.defaults,RW.ActionBox.prototype.defau
 });
 
 /*------------	RW.games library			------------------------*/
-RW.games = {};
+RW.games = {
+	version:'1.0.0'
+};
 
-/*------------	Class RW.games.Card		------------------------*/
+/*------------	RW.games.Card		------------------------*/
 RW.games.Card = function(oProps) {
-	if(RW.Object.call(this,oProps)) {
-		var src = (typeof oProps == 'string') ? oProps : oProps.img;
-		this.$img = $(document.createElement('img')).attr('src','./img/cards/'+src);
-		$(document.body).append(this.$img);
-		return this;
-	}
+	RW.Object.call(this)
+	return this;
 }
 
 RW.games.Card.prototype = new RW.Object;
 
+RW.games.Card.prototype.init = function(oProps) {
+	RW.Object.prototype.init.call(this);
+	var src = (typeof oProps == 'string') ? oProps : oProps.img;
+	this.$img = $(document.createElement('img')).attr('src','./img/cards/'+src);
+	$(document.body).append(this.$img);
+	return this;
+}
 
 /*
 -----------------------	DELETED CODE	----------------------------------------
