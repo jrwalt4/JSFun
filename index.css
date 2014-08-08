@@ -1,0 +1,41 @@
+body {
+	margin : 0;
+	padding : 10px;
+}
+
+div {
+	font:15px Century Gothic bold;
+}
+
+button {
+	font:inherit;
+	border-radius: 0;
+	background-color: #149AC6;
+	border-color: #149AC6;
+	padding:0.5em;
+	color:#FFFFFF;
+	border-radius:7px;
+	cursor:pointer;
+}
+
+.BackgroundShade {
+	position : fixed;
+	left: 0;
+	top:0;
+	background : #000000;
+	filter: alpha(opacity=40);
+	opacity: 0.4;
+}
+
+.ActionBox {
+	position: absolute;
+	padding: 10px 50px 10px 50px;
+	text-align: center;
+	border : 1px solid black;
+	box-shadow: 5px 5px 5px #888888;
+	background : whitesmoke;
+}
+
+.ActionBox button {
+	margin: 10px;
+}
