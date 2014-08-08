@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>RW.js test</title>
+<link rel="stylesheet" type="text/css" href="lib/index.css">
+<link rel="icon" type="image/ico" href="img/favicon.ico">
+<script src="lib/jquery.js"></script>
+<script src="lib/jquery.ui.js"></script>
+<script src="lib/RW.js"></script>
+<script src="lib/RWNode.js"></script>
+<script>
+var $p,$form,$submit;
+var people = [];
+$(document).ready(function() {
+	$p = $('p:first');
+	$form = $('form');
+	$button = $('#button').click({buttons:[{value:"Yes",id:'yes',callback:create_person},{id:'no',value:'No'}]},RW.confirm);
+});
+
+function create_person() {
+	var props = RW.objectify($form);
+	var person = (new RW.Sub).init(props);
+	people.push(person);
+	$p.text("Created "+person.name+"!");
+	return person;
+}
+</script>
+</head>
+<body>
+	<div>
+	<p>Filler text.</p>
+	<form id='person'>
+		<input type='text' name='name'></input><br/>
+		<input type='text' name='title'></input><br/>
+		<input type='number' name='age'></input><br/>
+	</form>
+	<button id='button'>Create Person</button>
+	</div>
+</body>
+</html>
